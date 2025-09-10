@@ -1,43 +1,280 @@
-HR-Analytics-Project
+# HR Analytics Dashboard 📊 — Employee Attrition
 
-Project Overview:
-This is an end-to-end data analytics project focused on developing a comprehensive HR Analytics Dashboard to help businesses monitor employee attrition and other key HR metrics. The project involved data cleaning, analysis, and visualization using a variety of tools to provide actionable insights.
+## **Overview**
 
-Problem Statement:
-A key challenge for Human Resources departments is understanding and mitigating employee attrition. 
+This project is a comprehensive, portfolio-grade HR analytics solution focused on understanding **employee attrition**. It showcases end-to-end skills in **data cleaning**, **SQL-based analysis (PostgreSQL)**, and **interactive visualization** using **Tableau** and **Excel**. The deliverables are structured for real-world stakeholders—HR leadership, People Analytics, and Business Partners—to enable **data-driven retention strategies**.
 
-This project aims to answer critical questions such as:
-- What is the current employee attrition rate?
-- Which departments and age groups have the highest attrition?
-- How does job satisfaction correlate with attrition?
-- What is the distribution of employees by gender, marital status, and education level?
+---
 
-Key Findings and Insights:
-- Attrition is highest among employees aged 25-34 and those with a Bachelor's Degree. This suggests specific targeting for retention strategies.
-- Laboratory Technicians and Sales Executives show the highest attrition counts, indicating a need for role-specific interventions.
-- Male employees make up a larger percentage (60%) of the total workforce, while attrition is relatively balanced between genders.
-- Job Satisfaction is highest in the Manufacturing Director role (average rating of 3.25), while Sales Representatives have the lowest average satisfaction.
-- Single employees have a significantly higher attrition rate compared to their married or divorced counterparts.
+## **Project Goals**
 
-Technical Skills and Tools Used
-  1) Data Cleaning & Analysis:
-      - SQL (PostgreSQL): Used to write complex queries to test and validate dashboard components, ensuring data integrity and accuracy. Queries included GROUP BY, JOIN, CROSSTAB, and aggregate functions.
-      - Excel: Utilized Power Query for initial data transformation and a smaller, dynamic dashboard for key metrics.
+**Primary Objective:** Build an interactive dashboard that surfaces the **drivers of employee turnover** and answers core business questions:
 
-  2) Data Visualization & Business Intelligence:
-     - Tableau: Developed an interactive, comprehensive dashboard to visualize key HR metrics, allowing stakeholders to filter data and gain insights in real-time.
-     - Excel: A separate, interactive dashboard was built in Excel to showcase key performance indicators (KPIs) and trends.
+* **What is our overall headcount and attrition rate?**
+* **Which demographics, departments, and roles see disproportionate attrition?**
+* **How do job satisfaction and work–life balance relate to attrition?**
+* **What do performance and compensation patterns suggest about risk?**
 
-How to View the Project
-- SQL Queries: Navigate to the SQL folder to review the SQL scripts used for data validation and component testing.
-- Excel Dashboard: Download and open the HR_Analytics_Dashboard_Excel.xlsx file to interact with the dynamic dashboard.
-- Tableau Dashboard: https://public.tableau.com/views/HR_Analytics_Dashboard_Tableau_17548358462780/HRAnalyticsDashboard?:language=en-GB&:sid=&:display_count=n&:origin=viz_share_link
+By translating raw HR data into clear KPIs and visual narratives, the project enables targeted **retention** and **employee experience** initiatives.
 
-Screenshots: View the images below for a quick look at the dashboards created in Tableau and Excel.
+---
 
-Tableau Dashboard Preview:
-<img width="1295" height="730" alt="Screenshot 2025-08-11 at 22 43 58" src="https://github.com/user-attachments/assets/226634b7-16a7-4786-9bef-4a6efc555728" />
+## **Tech Stack**
 
+* **Data Analysis & Modeling:** **SQL (PostgreSQL)**
+* **Data Storage:** CSV, Excel
+* **Visualization:** **Tableau**, **Excel** 
 
-Excel Dashboard Preview:
-<img width="1164" height="587" alt="Screenshot 2025-08-10 at 12 23 17" src="https://github.com/user-attachments/assets/a9930c6b-67df-49e8-845b-99c1b42eef15" />
+---
+
+## **Dataset**
+
+**Primary Source:** `Data/HR_Analytics_Dataset.csv`
+**Validation Sample:** `Data/hr_analytics_validation_sample.csv` (used to test queries before scaling)
+
+**Key Columns (selected):**
+
+* **Attrition** *(Yes/No)* — target variable
+* **Age** *(with derived CF\_age band)*
+* **Department** *(e.g., Sales, R\&D, HR)*
+* **JobRole**
+* **JobSatisfaction** *(1–4 scale in many public HR datasets)*
+* **YearsAtCompany**
+* **MonthlyIncome**
+
+> The project creates derived fields (e.g., **age bands**) and aggregates (e.g., **attrition rate**) to support dashboard visuals and consistent KPI definitions.
+
+---
+
+## **Repository Structure**
+
+```
+HR-Analytics-Dashboard/
+├─ Data/
+│  ├─ HR_Analytics_Dataset.csv
+│  └─ hr_analytics_validation_sample.csv
+├─ Excel/
+│  └─ HR_Analytics_Dashboard.xlsx
+├─ Sql/
+│  └─ hr_analytics_dashboard_validation_queries.sql
+└─ Tableau/
+   └─ HR_Analytics_Dashboard_Tableau.twb(x)
+```
+
+* **Data**: Core CSVs (source + validation)
+* **Excel**: Clickable dashboard & pivot outputs
+* **Sql**: Clean, reproducible queries (development + validation)
+* **Tableau**: Published workbook packaged with calculated fields and worksheets
+
+---
+
+## **KPIs & Business Logic**
+
+**Core KPIs**
+
+* **Headcount** = `COUNT(*)`
+* **Attrition Count** = `SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END)`
+* **Attrition Rate** = `Attrition Count / Headcount`
+* **Avg Age / Tenure / Income** = `AVG(Age)`, `AVG(YearsAtCompany)`, `AVG(MonthlyIncome)`
+* **Job Satisfaction Score (Avg)** = `AVG(JobSatisfaction)`
+
+**Segmentation Dimensions**
+
+* **Demographics**: Age bands, gender (if available)
+* **Org Structure**: Department, Job Role
+* **Experience**: YearsAtCompany (bucketed)
+* **Engagement/EX**: JobSatisfaction, WorkLifeBalance (if provided)
+* **Compensation**: MonthlyIncome (bands/quantiles)
+
+**Standardized Buckets (examples)**
+
+```sql
+-- Age Banding
+CASE
+  WHEN age BETWEEN 18 AND 24 THEN '18-24'
+  WHEN age BETWEEN 25 AND 34 THEN '25-34'
+  WHEN age BETWEEN 35 AND 44 THEN '35-44'
+  WHEN age BETWEEN 45 AND 54 THEN '45-54'
+  ELSE '55+'
+END AS age_band;
+
+-- Income Banding (example quantiles)
+CASE
+  WHEN MonthlyIncome < 3000 THEN '< 3k'
+  WHEN MonthlyIncome BETWEEN 3000 AND 6000 THEN '3k-6k'
+  WHEN MonthlyIncome BETWEEN 6001 AND 9000 THEN '6k-9k'
+  ELSE '9k+'
+END AS income_band;
+```
+
+> **Why standardize?** Consistent banding ensures visually comparable charts in Tableau/Excel and prevents skew from outliers.
+
+---
+
+## **Analytical Approach (SQL)**
+
+The SQL in `Sql/hr_analytics_dashboard_validation_queries.sql` follows a **clean-room** approach:
+
+1. **Validation First**
+
+   * Run on `hr_analytics_validation_sample.csv` (ingested to a staging table) to confirm logic.
+2. **Production Queries**
+
+   * Scale the same logic to the full `HR_Analytics_Dataset.csv`.
+3. **CTEs & Reusable Logic**
+
+   * Use **CTEs** for clarity (cleaning, banding, KPIs) and to simplify downstream consumption by Tableau/Excel.
+
+**Representative Query Patterns**
+
+```sql
+-- Overall KPIs
+WITH base AS (
+  SELECT
+    Attrition,
+    Age,
+    Department,
+    JobRole,
+    JobSatisfaction,
+    YearsAtCompany,
+    MonthlyIncome
+  FROM hr_analytics
+),
+kpis AS (
+  SELECT
+    COUNT(*)::int AS headcount,
+    SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END)::int AS attrition_count,
+    ROUND(
+      SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END)::numeric
+      / NULLIF(COUNT(*), 0), 4
+    ) AS attrition_rate,
+    ROUND(AVG(Age)::numeric, 2) AS avg_age
+  FROM base
+)
+SELECT * FROM kpis;
+```
+
+```sql
+-- Attrition by Age Band
+WITH banded AS (
+  SELECT
+    CASE
+      WHEN Age BETWEEN 18 AND 24 THEN '18-24'
+      WHEN Age BETWEEN 25 AND 34 THEN '25-34'
+      WHEN Age BETWEEN 35 AND 44 THEN '35-44'
+      WHEN Age BETWEEN 45 AND 54 THEN '45-54'
+      ELSE '55+'
+    END AS age_band,
+    Attrition
+  FROM hr_analytics
+)
+SELECT
+  age_band,
+  COUNT(*) AS total,
+  SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) AS attritions,
+  ROUND(
+    SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END)::numeric / NULLIF(COUNT(*),0),
+    4
+  ) AS attrition_rate
+FROM banded
+GROUP BY age_band
+ORDER BY age_band;
+```
+
+```sql
+-- Department / Job Role Cuts
+SELECT
+  Department,
+  JobRole,
+  COUNT(*) AS total,
+  SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END) AS attritions,
+  ROUND(
+    SUM(CASE WHEN Attrition='Yes' THEN 1 ELSE 0 END)::numeric / NULLIF(COUNT(*),0),
+    4
+  ) AS attrition_rate,
+  ROUND(AVG(JobSatisfaction)::numeric,2) AS avg_satisfaction,
+  ROUND(AVG(MonthlyIncome)::numeric,2) AS avg_income
+FROM hr_analytics
+GROUP BY Department, JobRole
+ORDER BY attritions DESC;
+```
+
+---
+
+## **Dashboards**
+
+### **Tableau (Public)**
+
+**Live Dashboard:**
+[HR Analytics Dashboard (Tableau)](https://public.tableau.com/views/HR_Analytics_Dashboard_Tableau_17548358462780/HRAnalyticsDashboard?:language=en-GB&:sid=&:display_count=n&:origin=viz_share_link)
+
+**Screenshot (Tableau):** <img width="1295" height="730" alt="Screenshot 2025-08-11 at 22 43 58" src="https://github.com/user-attachments/assets/226634b7-16a7-4786-9bef-4a6efc555728" />
+
+---
+
+### **Excel Dashboard**
+
+`Excel/HR_Analytics_Dashboard.xlsx`
+
+**Screenshot (Excel):** <img width="1164" height="587" alt="Screenshot 2025-08-10 at 12 23 17" src="https://github.com/user-attachments/assets/a9930c6b-67df-49e8-845b-99c1b42eef15" />
+
+---
+
+## **Key Findings (from this dataset)**
+
+* **Attrition by Age Group:** Highest attrition counts in **25–34**, followed by **35–44**.
+* **Attrition by Department:** **R\&D** and **Sales** account for the largest attrition volumes.
+* **Education & Attrition:** Employees with a **Bachelor’s Degree** show the highest attrition counts.
+* **Attrition by Role:** **Laboratory Technician**, **Sales Executive**, and **Research Scientist** are the most impacted roles.
+* **Job Satisfaction:** Average satisfaction surfaces as a **leading indicator**—teams/roles with lower averages tend to show **higher attrition rates**.
+* **Overall Metrics:** KPIs include **headcount**, **attrition count**, **attrition rate**, and **average age**, exposed via SQL and visualized in Tableau/Excel.
+
+> These insights help HR prioritize interventions (e.g., role-specific retention plans, career pathing for early-career cohorts, and targeted EX improvements).
+
+---
+
+## **How to Reproduce**
+
+1. **Clone & Open**
+
+   * Clone the repository and review the folder structure above.
+2. **Load Data**
+
+   * Import `Data/HR_Analytics_Dataset.csv` into PostgreSQL (e.g., table `hr_analytics`).
+   * Optionally load `hr_analytics_validation_sample.csv` into a staging table for dry runs.
+3. **Run SQL**
+
+   * Execute `Sql/hr_analytics_dashboard_validation_queries.sql`.
+   * Export result sets if needed for Excel or directly connect Tableau to PostgreSQL/CSV extracts.
+4. **Open Dashboards**
+
+   * **Tableau:** Open the workbook in `Tableau/`, or use the **Public** link above.
+   * **Excel:** Open `Excel/HR_Analytics_Dashboard.xlsx` and refresh pivots/slicers.
+
+---
+
+## **Screens & Interactions**
+
+* **Filters:** Age band, Department, Job Role, Tenure band, Income band
+* **Drilldowns:** Department → Role → KPIs & Attrition Rate
+* **Comparisons:** Satisfaction vs. Attrition; Income vs. Attrition; Tenure vs. Attrition
+
+> Designed so HR partners can quickly **slice** and **compare** risk hotspots and prioritize interventions.
+
+---
+
+## **Validation & QA**
+
+* **Two-phase validation** (sample first, full data later) reduces logic errors.
+* **Consistent banding** (age, income, tenure) keeps visuals comparable across tools.
+* **Null/Outlier handling** done in SQL (e.g., `NULLIF`, safe divisions, explicit bucketing).
+
+---
+
+## **What This Demonstrates**
+
+* **SQL craftsmanship:** Clean CTEs, robust aggregations, safe math, reusable banding.
+* **Analytics thinking:** KPI definitions aligned to business questions.
+* **Visualization:** Stakeholder-friendly dashboards in Tableau and Excel.
+* **Reproducibility:** Validated queries and a clear repo layout.
+
