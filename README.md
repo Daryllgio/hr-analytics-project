@@ -260,21 +260,3 @@ ORDER BY attritions DESC;
 * **Comparisons:** Satisfaction vs. Attrition; Income vs. Attrition; Tenure vs. Attrition
 
 > Designed so HR partners can quickly **slice** and **compare** risk hotspots and prioritize interventions.
-
----
-
-## **Validation & QA**
-
-* **Two-phase validation** (sample first, full data later) reduces logic errors.
-* **Consistent banding** (age, income, tenure) keeps visuals comparable across tools.
-* **Null/Outlier handling** done in SQL (e.g., `NULLIF`, safe divisions, explicit bucketing).
-
----
-
-## **What This Demonstrates**
-
-* **SQL craftsmanship:** Clean CTEs, robust aggregations, safe math, reusable banding.
-* **Analytics thinking:** KPI definitions aligned to business questions.
-* **Visualization:** Stakeholder-friendly dashboards in Tableau and Excel.
-* **Reproducibility:** Validated queries and a clear repo layout.
-
