@@ -1,4 +1,4 @@
-# HR Analytics Dashboard 📊 — Employee Attrition
+# Employee Attrition Analytics
 
 ## **Overview**
 
